@@ -77,7 +77,7 @@ agent-vue/
 
 - **环境切换**: 通过 `VITE_USE_MOCK=true/false` 控制使用 mock 还是真实 SSE
 - **Mock 实现** (`src/api/mock.ts`): 使用 `setInterval` 逐 token 输出预设文本，模拟 SSE chunk 推送，延迟 30–80ms/token
-- **真实 SSE** (`src/api/chat.ts`): 使用 `fetch + ReadableStream`，解析 `data: {"chunk":"..."}` 格式
+- **真实 SSE** (`src/api/chat.ts`): 使用 `fetch + ReadableStream`，解析 `data: {"chunk":"..."}` 格式；收到 `data: [DONE]` 时触发 `onDone` 回调
 - **统一接口**: 两者暴露相同的 `streamChat(messages, onChunk, onDone, onError)` 函数，composable 层无需关心底层实现
 
 ### 4.2 历史记录
@@ -97,6 +97,7 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: number
+  streaming?: boolean    // true 表示当前消息正在流式输出中
 }
 ```
 
@@ -230,6 +231,6 @@ VITE_APP_TITLE=Agent Vue
 
 - 用户认证 / 登录
 - 多 Agent 切换（保留扩展接口）
-- Markdown 实时渲染（基础实现，不含语法高亮）
+- Markdown 语法高亮（基础 Markdown 渲染在范围内，代码块语法高亮不在范围内）
 - 移动端适配
 - 单元测试
